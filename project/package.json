@@ -12,7 +12,10 @@
     "@prisma/client": "^6.11.1",
     "next": "15.3.5",
     "prisma": "^6.11.1",
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "buffer": "^6.0.3",
+    "async_hooks": "^1.0.0"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.12",
