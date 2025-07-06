@@ -1,10 +1,8 @@
-"use client";
+"use server";
 import React from "react";
 import insert from "./insert";
 
-export const runtime = "edge";
-
-export default function About() {
+export default async function About() {
   return (
     <>
       <form action={insert}>
