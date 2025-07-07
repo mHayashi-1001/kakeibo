@@ -1,48 +1,21 @@
-"use client";
-import React, { useState } from "react";
+"use server"; // サーバサイド専用
 
-export default function About() {
-  const [form, setForm] = useState({ id: "", date: "", name: "", price: "" });
-  const [message, setMessage] = useState("");
+import React from "react"; // Reactをインポート
+import insert from "./insert"; // データ挿入用関数
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const res = await fetch("/api/insert", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    setMessage(data.success ? "送信成功！" : "エラーが発生しました");
-  };
-
+// Aboutページのコンポーネントを定義
+export default async function About() {
   return (
-    <form onSubmit={handleSubmit}>
-      id = <input name="id" value={form.id} onChange={handleChange} /> <br />
-      date = <input
-        name="date"
-        value={form.date}
-        onChange={handleChange}
-      />{" "}
-      <br />
-      name = <input
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-      />{" "}
-      <br />
-      price = <input
-        name="price"
-        value={form.price}
-        onChange={handleChange}
-      />{" "}
-      <br />
-      <button type="submit">挿入</button>
-      <div>{message}</div>
-    </form>
+    <>
+      {/* データ挿入用フォーム(insert関数を呼び出し) */}
+      <form action={insert}>
+        id = <input id="1" name="id" /> <br />
+        date = <input id="2" name="date" /> <br />
+        name = <input id="3" name="name" /> <br />
+        price = <input id="4" name="price" /> <br />
+        {/* 送信ボタン */}
+        <button type="submit">挿入</button>
+      </form>
+    </>
   );
 }
