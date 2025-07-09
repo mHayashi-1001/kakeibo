@@ -9,19 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/adapter-neon": "^6.11.1",
     "@prisma/client": "^6.11.1",
+    "async_hooks": "^1.0.0",
+    "buffer": "^6.0.3",
     "next": "15.3.5",
     "prisma": "^6.11.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "buffer": "^6.0.3",
-    "async_hooks": "^1.0.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.12",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/estree": "^1.0.8",
+    "@types/json-schema": "^7.0.15",
+    "@types/node": "^20.19.6",
+    "@types/pg": "^8.15.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
