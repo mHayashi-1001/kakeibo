@@ -3,27 +3,27 @@
 ### フロントエンド
 
 - React（UI ライブラリ）
-- Next.js（React フレームワーク）
+- Next.js（React フレームワーク）  
   動的なユーザーインターフェース
 
 ### ホスティング
 
-- Cloudflare Pages（ホスティング）
+- Cloudflare Pages（ホスティング）  
   静的サイト配信
 
 ### API
 
-- Cloudflare Functions（API エンドポイント/サーバーレス関数）
+- Cloudflare Functions（API エンドポイント/サーバーレス関数）  
   サーバサイド処理
 
 ### バックエンド
 
-- Prisma（ORM/データベース操作）
-  TypeScript でデータベースを操作できる
+- Prisma（ORM/データベース操作）  
+  TypeScript でデータベースを操作できる  
   ⇒Cloudflare上では不可・・・？
 
 ### データベース
 
 - PostgreSQL（データベース）
-- Neon（サーバーレス PostgreSQL）
+- Neon（サーバーレス PostgreSQL）  
   サーバーレスで PostgreSQL サービスを使用できる
