@@ -41,6 +41,14 @@ export async function POST(request: Request) {
     : new Date().toISOString();
 
   try {
+    // idの重複チェック
+    const existing = await sql`SELECT id FROM item WHERE id = ${id}`;
+    if (existing.length > 0) {
+      return NextResponse.json({
+        success: false,
+        error: "同じIDが既に存在します(よくない)",
+      });
+    }
     await sql`
       INSERT INTO item (id, date, name, price)
       VALUES (${id}, ${date}, ${name}, ${price})

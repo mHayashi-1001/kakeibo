@@ -1,4 +1,12 @@
 "use client";
+
+const styles = {
+  form: "max-w-xs mx-auto space-y-4",
+  input: "w-full border px-2 py-1",
+  label: "block font-bold",
+  button: "w-full bg-blue-500 text-white py-2",
+};
+
 import React, { useState } from "react";
 
 export default function Confirm() {
@@ -32,7 +40,6 @@ export default function Confirm() {
     setMessage(
       data.success ? "送信成功！" : `エラー発生: ${data.error ?? "謎"}`
     );
-
     // 送信成功時はフォームをクリア
     if (data.success) {
       setForm({ id: "", date: "", name: "", price: "" });
@@ -41,29 +48,52 @@ export default function Confirm() {
 
   return (
     // フォーム：onSubmitでhandleSubmitが呼び出し
-    <form onSubmit={handleSubmit}>
-      id = <input name="id" value={form.id} onChange={handleChange} /> <br />
-      date = <input
-        name="date"
-        value={form.date}
-        onChange={handleChange}
-      />{" "}
-      <br />
-      name = <input
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-      />{" "}
-      <br />
-      price = <input
-        name="price"
-        value={form.price}
-        onChange={handleChange}
-      />{" "}
-      <br />
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <label className={styles.label} htmlFor="id">
+        ID
+        <input
+          id="id"
+          name="id"
+          value={form.id}
+          onChange={handleChange}
+          className={styles.input}
+        />
+      </label>
+      <label className={styles.label} htmlFor="date">
+        日付
+        <input
+          id="date"
+          name="date"
+          value={form.date}
+          onChange={handleChange}
+          className={styles.input}
+        />
+      </label>
+      <label className={styles.label} htmlFor="name">
+        名前
+        <input
+          id="name"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          className={styles.input}
+        />
+      </label>
+      <label className={styles.label} htmlFor="price">
+        金額
+        <input
+          id="price"
+          name="price"
+          value={form.price}
+          onChange={handleChange}
+          className={styles.input}
+        />
+      </label>
       {/* フォーム送信：handleSubmit呼び出し */}
-      <button type="submit">挿入</button>
-      <div>{message}</div>
+      <button type="submit" className={styles.button}>
+        挿入
+      </button>
+      <div className="text-center mt-2">{message}</div>
     </form>
   );
 }
