@@ -1,31 +1,27 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@/generated/prisma/";
+import { neon } from "@neondatabase/serverless";
 
-// POSTリクエストを処理する関数
 export async function POST(request: Request) {
-  // リクエストボディのJSONデータを取得
   const data = await request.json();
-  // Prisma Clientのインスタンスを作成
-  const client = new PrismaClient();
+  const connectionString = process.env.DATABASE_URL!;
+  const sql = neon(connectionString);
+
   try {
-    // itemテーブルのレコードを作成
-    await client.item.create({
-      data: {
-        id: Number.parseInt(data.id),
-        date: data.date
-          ? new Date(data.date).toISOString()
-          : new Date().toISOString(),
-        name: data.name, // 名前
-        price: Number.parseInt(data.price),
-      },
-    });
-    // 成功時のレスポンス
+    await sql`
+      INSERT INTO item (id, date, name, price)
+      VALUES (
+        ${Number.parseInt(data.id)},
+        ${
+          data.date
+            ? new Date(data.date).toISOString()
+            : new Date().toISOString()
+        },
+        ${data.name},
+        ${Number.parseInt(data.price)}
+      )
+    `;
     return NextResponse.json({ success: true });
   } catch (e) {
-    // エラー発生時のレスポンス
     return NextResponse.json({ success: false, error: e?.toString() });
-  } finally {
-    // 切断
-    await client.$disconnect();
   }
 }
