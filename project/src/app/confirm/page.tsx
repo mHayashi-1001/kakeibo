@@ -32,6 +32,11 @@ export default function Confirm() {
     setMessage(
       data.success ? "送信成功！" : `エラー発生: ${data.error ?? "謎"}`
     );
+
+    // 送信成功時はフォームをクリア
+    if (data.success) {
+      setForm({ id: "", date: "", name: "", price: "" });
+    }
   };
 
   return (
