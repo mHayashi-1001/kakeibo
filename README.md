@@ -20,6 +20,7 @@
 
 - Prisma（ORM/データベース操作）
   TypeScript でデータベースを操作できる
+  ⇒Cloudflare上では不可・・・？
 
 ### データベース
 
