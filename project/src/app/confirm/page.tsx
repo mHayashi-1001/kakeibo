@@ -27,8 +27,8 @@ export default function Confirm() {
       ...form,
       price: form.price === "" ? "0" : form.price,
     };
-    // API（/api/insertForPrisma）にPOSTリクエスト
-    const res = await fetch("/api/insertForPrisma", {
+    // API（/api/insert）にPOSTリクエスト
+    const res = await fetch("/api/insert", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(sendForm), // 入力値をJSON文字列にして送信
