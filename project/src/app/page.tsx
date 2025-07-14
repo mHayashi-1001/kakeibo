@@ -12,6 +12,14 @@ export default function Home() {
           height={38}
           priority
         />
+
+        <a
+          className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+          href="/entry"
+        >
+          Entry
+        </a>
+
         <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2 tracking-[-.01em]">
             Get started by editing{" "}
