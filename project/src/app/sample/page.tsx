@@ -3,8 +3,8 @@
 import React from "react"; // Reactをインポート
 import insert from "./insert"; // データ挿入用関数
 
-// Aboutページのコンポーネントを定義
-export default async function About() {
+// Sampleページのコンポーネントを定義
+export default async function Sample() {
   return (
     <>
       {/* データ挿入用フォーム(insert関数を呼び出し) */}
