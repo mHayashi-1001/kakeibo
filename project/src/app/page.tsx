@@ -24,7 +24,7 @@ export default function Home() {
             className="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600"
             href="/list"
           >
-            List!
+            List
           </a>
         </div>
 
