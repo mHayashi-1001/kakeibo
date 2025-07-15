@@ -13,12 +13,20 @@ export default function Home() {
           priority
         />
 
-        <a
-          className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
-          href="/entry"
-        >
-          Entry
-        </a>
+        <div className="flex gap-4">
+          <a
+            className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+            href="/entry"
+          >
+            Entry
+          </a>
+          <a
+            className="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600"
+            href="/list"
+          >
+            List,,
+          </a>
+        </div>
 
         <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2 tracking-[-.01em]">
