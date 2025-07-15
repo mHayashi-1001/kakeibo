@@ -1,0 +1,30 @@
+name: PR Build
+
+on:
+  pull_request:
+    branches:
+      - main # プルリクのターゲットブランチを指定
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run build
+        run: yarn build
+
+      - name: Run tests
+        run: yarn test
