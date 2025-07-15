@@ -14,6 +14,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          path: .
+
+      - name: Show current directory and files
+        run: |
+          pwd
+          ls -l
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
