@@ -8,7 +8,7 @@ export async function GET() {
   if (!connectionString) {
     return NextResponse.json({
       success: false,
-      error: "DATABASE_URLが設定されていません！",
+      error: "DATABASE_URLが設定されていません",
     });
   }
   const sql = neon(connectionString);
