@@ -39,6 +39,7 @@ export default function EntryList() {
       try {
         // APIから一覧データを取得
         const res = await fetch("/api/search");
+
         const data = await res.json();
         if (data.success) {
           setItems(data.items);
