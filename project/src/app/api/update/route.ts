@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
+import { CATEGORIES_BY_TYPE, ITEM_TYPES, ItemType } from "@/lib/categories";
 
 export const runtime = "edge";
 
@@ -37,11 +38,13 @@ export async function PUT(request: Request) {
   const price = Number.parseInt(data.price);
   const name = data.name;
   const date = new Date(data.date).toISOString();
+  const type = data.type as ItemType;
+  const category = data.category;
 
   try {
     const result = await sql`
       UPDATE item
-      SET date = ${date}, name = ${name}, price = ${price}
+      SET date = ${date}, name = ${name}, price = ${price}, category = ${category}, type = ${type}
       WHERE id = ${id}
       RETURNING id
     `;
@@ -65,5 +68,11 @@ function validateData(data: any) {
   if (!data.id || isNaN(Number(data.id))) return "idが不正です";
   if (!data.name || typeof data.name !== "string") return "nameが不正です";
   if (!data.price || isNaN(Number(data.price))) return "priceが不正です";
+  if (!ITEM_TYPES.includes(data.type)) return "typeが不正です";
+  if (
+    !data.category ||
+    !CATEGORIES_BY_TYPE[data.type as ItemType].includes(data.category)
+  )
+    return "categoryが不正です";
   return null;
 }
