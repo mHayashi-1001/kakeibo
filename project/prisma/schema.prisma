@@ -15,8 +15,10 @@ datasource db {
 }   
 
 model item {
-  id    Int      @id @default(autoincrement())
-  date  DateTime
-  name  String
-  price Int
+  id       Int      @id @default(autoincrement())
+  date     DateTime
+  name     String
+  price    Int
+  category String   @default("その他")
+  type     String   @default("支出")
 }

@@ -13,7 +13,7 @@ export async function GET() {
   }
   const sql = neon(connectionString);
   try {
-    const items = await sql`SELECT id, date, name, price FROM item ORDER BY id`;
+    const items = await sql`SELECT id, date, name, price, category, type FROM item ORDER BY id`;
     return NextResponse.json({ success: true, items });
   } catch (e: unknown) {
     return NextResponse.json({ success: false, error: String(e) });

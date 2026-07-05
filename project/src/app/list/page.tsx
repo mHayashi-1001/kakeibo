@@ -18,6 +18,7 @@ const styles = {
 // useEffect:ライフサイクル管理用
 // useState:状態管理用
 import React, { useEffect, useState } from "react";
+import { CATEGORIES_BY_TYPE, ITEM_TYPES, ItemType } from "@/lib/categories";
 
 // APIから取得の型定義
 type Item = {
@@ -25,6 +26,8 @@ type Item = {
   date: string;
   name: string;
   price: number;
+  category: string;
+  type: ItemType;
 };
 
 export default function EntryList() {
@@ -36,7 +39,13 @@ export default function EntryList() {
   // 編集中の行id(nullなら編集していない)
   const [editingId, setEditingId] = useState<number | null>(null);
   // 編集中の入力値
-  const [editForm, setEditForm] = useState({ date: "", name: "", price: "" });
+  const [editForm, setEditForm] = useState({
+    date: "",
+    name: "",
+    price: "",
+    type: ITEM_TYPES[0] as ItemType,
+    category: CATEGORIES_BY_TYPE[ITEM_TYPES[0]][0],
+  });
   // 保存・削除時のエラーメッセージ
   const [actionError, setActionError] = useState("");
 
@@ -73,6 +82,8 @@ export default function EntryList() {
       date: item.date.slice(0, 10),
       name: item.name,
       price: String(item.price),
+      type: item.type,
+      category: item.category,
     });
   };
 
@@ -81,8 +92,16 @@ export default function EntryList() {
     setActionError("");
   };
 
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEditChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  // 収支種別が変更されたときは、選択中のカテゴリをその種別の先頭カテゴリにリセットする
+  const handleEditTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const type = e.target.value as ItemType;
+    setEditForm({ ...editForm, type, category: CATEGORIES_BY_TYPE[type][0] });
   };
 
   // 編集内容を保存
@@ -103,6 +122,8 @@ export default function EntryList() {
                 date: new Date(editForm.date).toISOString(),
                 name: editForm.name,
                 price: Number.parseInt(editForm.price),
+                category: editForm.category,
+                type: editForm.type,
               }
             : item
         )
@@ -148,6 +169,8 @@ export default function EntryList() {
               <th className={styles.th}>日付</th>
               <th className={styles.th}>名前</th>
               <th className={styles.th}>金額</th>
+              <th className={styles.th}>種別</th>
+              <th className={styles.th}>カテゴリ</th>
               <th className={styles.th}>操作</th>
             </tr>
           </thead>
@@ -182,6 +205,34 @@ export default function EntryList() {
                     />
                   </td>
                   <td className={styles.td}>
+                    <select
+                      name="type"
+                      value={editForm.type}
+                      onChange={handleEditTypeChange}
+                      className={styles.input}
+                    >
+                      {ITEM_TYPES.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className={styles.td}>
+                    <select
+                      name="category"
+                      value={editForm.category}
+                      onChange={handleEditChange}
+                      className={styles.input}
+                    >
+                      {CATEGORIES_BY_TYPE[editForm.type].map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className={styles.td}>
                     <button
                       className={styles.button}
                       onClick={() => saveEdit(item.id)}
@@ -207,6 +258,8 @@ export default function EntryList() {
                   </td>
                   <td className={styles.editableTd}>{item.name}</td>
                   <td className={styles.editableTd}>{item.price}</td>
+                  <td className={styles.editableTd}>{item.type}</td>
+                  <td className={styles.editableTd}>{item.category}</td>
                   <td className={styles.td}>
                     <button
                       className={styles.button}
