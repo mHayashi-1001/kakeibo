@@ -1,10 +1,23 @@
 "use client";
 
 const styles = {
-  form: "max-w-xs mx-auto space-y-4",
-  input: "w-full border px-2 py-1",
-  label: "block font-bold",
-  button: "w-full bg-blue-500 text-white py-2",
+  card: "max-w-md mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-6 space-y-5",
+  title: "text-xl font-bold text-center",
+  label: "block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1",
+  input:
+    "w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:focus:ring-indigo-600",
+  typeButton:
+    "flex-1 rounded-md py-2 text-sm font-semibold border transition-colors",
+  typeButtonActiveExpense: "bg-rose-500 border-rose-500 text-white",
+  typeButtonActiveIncome: "bg-emerald-500 border-emerald-500 text-white",
+  typeButtonInactive:
+    "bg-white dark:bg-slate-950 border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400",
+  button:
+    "w-full rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 transition-colors",
+  successMessage:
+    "text-center text-sm rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 py-2",
+  errorMessage:
+    "text-center text-sm rounded-md bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 py-2",
 };
 
 import React, { useState } from "react";
@@ -20,6 +33,7 @@ export default function Confirm() {
     category: CATEGORIES_BY_TYPE[ITEM_TYPES[0]][0],
   });
   const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
 
   // 入力欄が変更されたときに呼ばれる関数
   // e.target.nameに対応する値を更新する(既存のformの値を上書き)
@@ -30,8 +44,7 @@ export default function Confirm() {
   };
 
   // 収支種別が変更されたときは、選択中のカテゴリをその種別の先頭カテゴリにリセットする
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const type = e.target.value as ItemType;
+  const handleTypeChange = (type: ItemType) => {
     setForm({ ...form, type, category: CATEGORIES_BY_TYPE[type][0] });
   };
 
@@ -52,6 +65,7 @@ export default function Confirm() {
     // レスポンスをJSONとして受け取る
     const data = await res.json();
     // APIから返されたエラー内容も表示する
+    setSuccess(data.success);
     setMessage(
       data.success ? "送信成功！" : `エラー発生: ${data.error ?? "謎"}`
     );
@@ -69,25 +83,33 @@ export default function Confirm() {
 
   return (
     // フォーム：onSubmitでhandleSubmitが呼び出し
-    <form onSubmit={handleSubmit} className={styles.form}>
-      <label className={styles.label} htmlFor="type">
-        収支種別
-        <select
-          id="type"
-          name="type"
-          value={form.type}
-          onChange={handleTypeChange}
-          className={styles.input}
-        >
+    <form onSubmit={handleSubmit} className={styles.card}>
+      <h1 className={styles.title}>収支を入力</h1>
+
+      <div>
+        <span className={styles.label}>収支種別</span>
+        <div className="flex gap-2">
           {ITEM_TYPES.map((type) => (
-            <option key={type} value={type}>
+            <button
+              key={type}
+              type="button"
+              onClick={() => handleTypeChange(type)}
+              className={`${styles.typeButton} ${
+                form.type === type
+                  ? type === "支出"
+                    ? styles.typeButtonActiveExpense
+                    : styles.typeButtonActiveIncome
+                  : styles.typeButtonInactive
+              }`}
+            >
               {type}
-            </option>
+            </button>
           ))}
-        </select>
-      </label>
-      <label className={styles.label} htmlFor="category">
-        カテゴリ
+        </div>
+      </div>
+
+      <label className="block" htmlFor="category">
+        <span className={styles.label}>カテゴリ</span>
         <select
           id="category"
           name="category"
@@ -102,41 +124,53 @@ export default function Confirm() {
           ))}
         </select>
       </label>
-      <label className={styles.label} htmlFor="date">
-        日付
+
+      <label className="block" htmlFor="date">
+        <span className={styles.label}>日付</span>
         <input
           id="date"
           name="date"
+          type="date"
           value={form.date}
           onChange={handleChange}
           className={styles.input}
         />
       </label>
-      <label className={styles.label} htmlFor="name">
-        名前
+
+      <label className="block" htmlFor="name">
+        <span className={styles.label}>内容</span>
         <input
           id="name"
           name="name"
+          placeholder="例: スーパーで買い物"
           value={form.name}
           onChange={handleChange}
           className={styles.input}
         />
       </label>
-      <label className={styles.label} htmlFor="price">
-        金額
+
+      <label className="block" htmlFor="price">
+        <span className={styles.label}>金額</span>
         <input
           id="price"
           name="price"
+          inputMode="numeric"
+          placeholder="0"
           value={form.price}
           onChange={handleChange}
           className={styles.input}
         />
       </label>
+
       {/* フォーム送信：handleSubmit呼び出し */}
       <button type="submit" className={styles.button}>
-        挿入
+        登録する
       </button>
-      <div className="text-center mt-2">{message}</div>
+      {message && (
+        <div className={success ? styles.successMessage : styles.errorMessage}>
+          {message}
+        </div>
+      )}
     </form>
   );
 }
