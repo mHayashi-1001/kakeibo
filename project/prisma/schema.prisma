@@ -15,8 +15,8 @@ datasource db {
 }   
 
 model item {
-  id Int @unique
-  date DateTime
-  name String
+  id    Int      @id @default(autoincrement())
+  date  DateTime
+  name  String
   price Int
 }
