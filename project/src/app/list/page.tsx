@@ -7,8 +7,11 @@ const styles = {
   table: "w-full border",
   th: "border px-2 py-1",
   td: "border px-2 py-1",
+  editableTd: "border px-2 py-1 cursor-pointer",
+  input: "w-full border px-1",
   error: "text-center text-red-500",
   loading: "text-center",
+  button: "px-2 py-1 text-sm",
 };
 
 // Reactフック
@@ -29,6 +32,13 @@ export default function EntryList() {
   const [items, setItems] = useState<Item[]>([]); //データの配列
   const [loading, setLoading] = useState(true); //ローディングかどうか
   const [error, setError] = useState(""); //エラーメッセージ
+
+  // 編集中の行id(nullなら編集していない)
+  const [editingId, setEditingId] = useState<number | null>(null);
+  // 編集中の入力値
+  const [editForm, setEditForm] = useState({ date: "", name: "", price: "" });
+  // 保存・削除時のエラーメッセージ
+  const [actionError, setActionError] = useState("");
 
   useEffect(() => {
     // 関数の実行タイミングをReactのレンダリング後まで遅らせる
@@ -55,10 +65,77 @@ export default function EntryList() {
     fetchData(); // データ取得実行
   }, []);
 
+  // 行クリックで編集モードに入る
+  const startEdit = (item: Item) => {
+    setActionError("");
+    setEditingId(item.id);
+    setEditForm({
+      date: item.date.slice(0, 10),
+      name: item.name,
+      price: String(item.price),
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setActionError("");
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  // 編集内容を保存
+  const saveEdit = async (id: number) => {
+    setActionError("");
+    const res = await fetch("/api/update", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, ...editForm }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                date: new Date(editForm.date).toISOString(),
+                name: editForm.name,
+                price: Number.parseInt(editForm.price),
+              }
+            : item
+        )
+      );
+      setEditingId(null);
+    } else {
+      setActionError(data.error || "更新に失敗しました");
+    }
+  };
+
+  // 削除
+  const deleteItem = async (id: number) => {
+    if (!window.confirm("削除しますか？")) return;
+    setActionError("");
+    const res = await fetch("/api/delete", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      setItems((prev) => prev.filter((item) => item.id !== id));
+      if (editingId === id) setEditingId(null);
+    } else {
+      setActionError(data.error || "削除に失敗しました");
+    }
+  };
+
   // 画面描画
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>一覧画面</h1>
+      {actionError && <div className={styles.error}>{actionError}</div>}
       {loading ? (
         <div className={styles.loading}>動いてます</div>
       ) : error ? (
@@ -71,17 +148,79 @@ export default function EntryList() {
               <th className={styles.th}>日付</th>
               <th className={styles.th}>名前</th>
               <th className={styles.th}>金額</th>
+              <th className={styles.th}>操作</th>
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => (
-              <tr key={item.id}>
-                <td className={styles.td}>{item.id}</td>
-                <td className={styles.td}>{item.date?.slice(0, 10)}</td>
-                <td className={styles.td}>{item.name}</td>
-                <td className={styles.td}>{item.price}</td>
-              </tr>
-            ))}
+            {items.map((item) =>
+              editingId === item.id ? (
+                <tr key={item.id}>
+                  <td className={styles.td}>{item.id}</td>
+                  <td className={styles.td}>
+                    <input
+                      type="date"
+                      name="date"
+                      value={editForm.date}
+                      onChange={handleEditChange}
+                      className={styles.input}
+                    />
+                  </td>
+                  <td className={styles.td}>
+                    <input
+                      name="name"
+                      value={editForm.name}
+                      onChange={handleEditChange}
+                      className={styles.input}
+                    />
+                  </td>
+                  <td className={styles.td}>
+                    <input
+                      name="price"
+                      value={editForm.price}
+                      onChange={handleEditChange}
+                      className={styles.input}
+                    />
+                  </td>
+                  <td className={styles.td}>
+                    <button
+                      className={styles.button}
+                      onClick={() => saveEdit(item.id)}
+                    >
+                      保存
+                    </button>
+                    <button className={styles.button} onClick={cancelEdit}>
+                      キャンセル
+                    </button>
+                    <button
+                      className={styles.button}
+                      onClick={() => deleteItem(item.id)}
+                    >
+                      削除
+                    </button>
+                  </td>
+                </tr>
+              ) : (
+                <tr key={item.id} onClick={() => startEdit(item)}>
+                  <td className={styles.editableTd}>{item.id}</td>
+                  <td className={styles.editableTd}>
+                    {item.date?.slice(0, 10)}
+                  </td>
+                  <td className={styles.editableTd}>{item.name}</td>
+                  <td className={styles.editableTd}>{item.price}</td>
+                  <td className={styles.td}>
+                    <button
+                      className={styles.button}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteItem(item.id);
+                      }}
+                    >
+                      削除
+                    </button>
+                  </td>
+                </tr>
+              )
+            )}
           </tbody>
         </table>
       )}
