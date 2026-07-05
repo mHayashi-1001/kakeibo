@@ -11,7 +11,7 @@ import React, { useState } from "react";
 
 export default function Confirm() {
   // state
-  const [form, setForm] = useState({ id: "", date: "", name: "", price: "" });
+  const [form, setForm] = useState({ date: "", name: "", price: "" });
   const [message, setMessage] = useState("");
 
   // 入力欄が変更されたときに呼ばれる関数
@@ -42,23 +42,13 @@ export default function Confirm() {
     );
     // 送信成功時はフォームをクリア
     if (data.success) {
-      setForm({ id: "", date: "", name: "", price: "" });
+      setForm({ date: "", name: "", price: "" });
     }
   };
 
   return (
     // フォーム：onSubmitでhandleSubmitが呼び出し
     <form onSubmit={handleSubmit} className={styles.form}>
-      <label className={styles.label} htmlFor="id">
-        ID
-        <input
-          id="id"
-          name="id"
-          value={form.id}
-          onChange={handleChange}
-          className={styles.input}
-        />
-      </label>
       <label className={styles.label} htmlFor="date">
         日付
         <input

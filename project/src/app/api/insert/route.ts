@@ -33,7 +33,6 @@ export async function POST(request: Request) {
   const sql = neon(connectionString);
 
   // 各値を適切な型に変換
-  const id = Number.parseInt(data.id);
   const price = Number.parseInt(data.price);
   const name = data.name;
   const date = data.date
@@ -41,19 +40,12 @@ export async function POST(request: Request) {
     : new Date().toISOString();
 
   try {
-    // idの重複チェック
-    const existing = await sql`SELECT id FROM item WHERE id = ${id}`;
-    if (existing.length > 0) {
-      return NextResponse.json({
-        success: false,
-        error: "同じIDが既に存在します(よくない)",
-      });
-    }
-    await sql`
-      INSERT INTO item (id, date, name, price)
-      VALUES (${id}, ${date}, ${name}, ${price})
+    const result = await sql`
+      INSERT INTO item (date, name, price)
+      VALUES (${date}, ${name}, ${price})
+      RETURNING id
     `;
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, id: result[0].id });
   } catch (e: any) {
     return NextResponse.json({ success: false, error: e?.toString() });
   }
@@ -64,7 +56,6 @@ export async function POST(request: Request) {
  */
 function validateData(data: any) {
   if (!data) return "データがありません";
-  if (!data.id || isNaN(Number(data.id))) return "idが不正です";
   if (!data.name || typeof data.name !== "string") return "nameが不正です";
   if (!data.price || isNaN(Number(data.price))) return "priceが不正です";
   return null;
