@@ -1,5 +1,8 @@
 "use client";
 
+// 収支入力フォーム画面(/entry)。入力内容を/api/insertにPOSTして登録する
+
+// スタイルをオブジェクトで管理(Tailwindのクラス名をまとめておくと使い回しやすい)
 const styles = {
   card: "max-w-md mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm p-6 space-y-5",
   title: "text-xl font-bold text-center",

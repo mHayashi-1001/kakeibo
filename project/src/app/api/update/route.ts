@@ -2,10 +2,13 @@ import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { CATEGORIES_BY_TYPE, ITEM_TYPES, ItemType } from "@/lib/categories";
 
+// Edge Runtimeで動かす理由は src/app/api/insert/route.ts のコメント・CLAUDE.md参照
 export const runtime = "edge";
 
 /**
  * itemテーブルの既存レコードを更新するAPIエンドポイント
+ * PUT /api/update
+ * (/list画面で行をクリックして編集・保存したときに呼ばれる)
  */
 export async function PUT(request: Request) {
   let data;
@@ -42,6 +45,7 @@ export async function PUT(request: Request) {
   const category = data.category;
 
   try {
+    // 指定idの行を全項目まとめて更新。該当行がなければ0件で返ってくる
     const result = await sql`
       UPDATE item
       SET date = ${date}, name = ${name}, price = ${price}, category = ${category}, type = ${type}
@@ -62,6 +66,7 @@ export async function PUT(request: Request) {
 
 /**
  * データのバリデーションを行う関数
+ * 問題があればエラーメッセージ(文字列)を、問題なければnullを返す
  */
 function validateData(data: any) {
   if (!data) return "データがありません";

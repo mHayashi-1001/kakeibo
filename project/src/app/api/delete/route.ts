@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 
+// Edge Runtimeで動かす理由は src/app/api/insert/route.ts のコメント・CLAUDE.md参照
 export const runtime = "edge";
 
 /**
  * itemテーブルのレコードを削除するAPIエンドポイント
+ * DELETE /api/delete
+ * (/list画面の削除ボタンから呼ばれる)
  */
 export async function DELETE(request: Request) {
   let data;
@@ -33,6 +36,7 @@ export async function DELETE(request: Request) {
   const id = Number.parseInt(data.id);
 
   try {
+    // 削除できた行のidが返ってくるので、0件なら対象なしと判断できる
     const result = await sql`
       DELETE FROM item WHERE id = ${id} RETURNING id
     `;
