@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
-import { CATEGORIES_BY_TYPE, ITEM_TYPES, ItemType } from "@/lib/categories";
+import { ItemType } from "@/lib/categories";
+import { validateItemFields } from "@/lib/validate";
 
 // Cloudflare Pages(next-on-pages)にデプロイするため、このAPIルートはEdge Runtimeで動く。
 // Edge Runtimeは生のTCP/TLSソケットを扱えないため、通常のpgドライバやPrisma標準エンジンは使えない。
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
   let data;
   try {
     data = await request.json();
-  } catch (e) {
+  } catch {
     return NextResponse.json({
       success: false,
       error: "JSONのパースに失敗しました",
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
   }
 
   // 入力値のチェック(不正な場合はエラーメッセージを返して終了)
-  const validationError = validateData(data);
+  const validationError = validateItemFields(data);
   if (validationError) {
     return NextResponse.json({ success: false, error: validationError });
   }
@@ -57,27 +58,7 @@ export async function POST(request: Request) {
       RETURNING id
     `;
     return NextResponse.json({ success: true, id: result[0].id });
-  } catch (e: any) {
-    return NextResponse.json({ success: false, error: e?.toString() });
+  } catch (e: unknown) {
+    return NextResponse.json({ success: false, error: String(e) });
   }
-}
-
-/**
- * データのバリデーションを行う関数
- * 問題があればエラーメッセージ(文字列)を、問題なければnullを返す
- */
-function validateData(data: any) {
-  if (!data) return "データがありません";
-  if (!data.name || typeof data.name !== "string") return "nameが不正です";
-  // 金額0円を許容するため、未入力(空文字/undefined/null)かどうかとNaNかどうかを別にチェックする
-  if (data.price === "" || data.price == null || isNaN(Number(data.price)))
-    return "priceが不正です";
-  if (!ITEM_TYPES.includes(data.type)) return "typeが不正です";
-  // categoryは選択中のtypeに対応する候補一覧に含まれているかをチェックする
-  if (
-    !data.category ||
-    !CATEGORIES_BY_TYPE[data.type as ItemType].includes(data.category)
-  )
-    return "categoryが不正です";
-  return null;
 }

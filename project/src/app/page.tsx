@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 // トップページ。入力画面(/entry)と一覧画面(/list)へのリンクカードを並べるだけのシンプルな構成
 export default function Home() {
   return (
@@ -10,7 +12,7 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md">
-        <a
+        <Link
           href="/entry"
           className="group rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all"
         >
@@ -20,8 +22,8 @@ export default function Home() {
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             収支を記録する
           </p>
-        </a>
-        <a
+        </Link>
+        <Link
           href="/list"
           className="group rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all"
         >
@@ -31,7 +33,7 @@ export default function Home() {
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             記録を確認・編集する
           </p>
-        </a>
+        </Link>
       </div>
     </div>
   );

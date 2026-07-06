@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
-import { CATEGORIES_BY_TYPE, ITEM_TYPES, ItemType } from "@/lib/categories";
+import { ItemType } from "@/lib/categories";
+import { validateId, validateItemFields } from "@/lib/validate";
 
 // Edge Runtimeで動かす理由は src/app/api/insert/route.ts のコメント・CLAUDE.md参照
 export const runtime = "edge";
@@ -14,14 +15,14 @@ export async function PUT(request: Request) {
   let data;
   try {
     data = await request.json();
-  } catch (e) {
+  } catch {
     return NextResponse.json({
       success: false,
       error: "JSONのパースに失敗しました",
     });
   }
 
-  const validationError = validateData(data);
+  const validationError = validateId(data) || validateItemFields(data);
   if (validationError) {
     return NextResponse.json({ success: false, error: validationError });
   }
@@ -59,27 +60,7 @@ export async function PUT(request: Request) {
       });
     }
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    return NextResponse.json({ success: false, error: e?.toString() });
+  } catch (e: unknown) {
+    return NextResponse.json({ success: false, error: String(e) });
   }
-}
-
-/**
- * データのバリデーションを行う関数
- * 問題があればエラーメッセージ(文字列)を、問題なければnullを返す
- */
-function validateData(data: any) {
-  if (!data) return "データがありません";
-  if (!data.id || isNaN(Number(data.id))) return "idが不正です";
-  if (!data.name || typeof data.name !== "string") return "nameが不正です";
-  // 金額0円を許容するため、未入力(空文字/undefined/null)かどうかとNaNかどうかを別にチェックする
-  if (data.price === "" || data.price == null || isNaN(Number(data.price)))
-    return "priceが不正です";
-  if (!ITEM_TYPES.includes(data.type)) return "typeが不正です";
-  if (
-    !data.category ||
-    !CATEGORIES_BY_TYPE[data.type as ItemType].includes(data.category)
-  )
-    return "categoryが不正です";
-  return null;
 }
