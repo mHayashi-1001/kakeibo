@@ -1,6 +1,6 @@
 # 家計簿
 
-日々の収支をシンプルに記録・確認できる家計簿アプリです。
+日々の収支をシンプルに記録・確認できる家計簿アプリです。React学習を目的に作成しています。
 
 ## 機能
 
@@ -14,6 +14,7 @@
 .
 ├── CLAUDE.md          # Claude Code向けの開発ガイド
 ├── README.md          # このファイル
+├── docs/              # 学習メモなど
 ├── .devcontainer/     # 開発用コンテナ設定(Node.js + ローカルPostgres)
 ├── .github/workflows/ # PRビルドチェック(GitHub Actions)
 └── project/           # アプリ本体(Next.js)
@@ -66,3 +67,7 @@ yarn dev
 `http://localhost:3000` で確認できます。
 
 DB接続まわりの制約(Edge Runtime・本番/ローカルDBの分離)や開発時の注意点は [CLAUDE.md](./CLAUDE.md) にまとめています。
+
+## React学習メモ
+
+このコードで使われているReactの基本概念(コンポーネント・props・state・useEffectなど)を、実際のコードを引用しながら解説しています。→ [docs/react-basics.md](./docs/react-basics.md)
