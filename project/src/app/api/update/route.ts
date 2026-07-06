@@ -72,7 +72,9 @@ function validateData(data: any) {
   if (!data) return "データがありません";
   if (!data.id || isNaN(Number(data.id))) return "idが不正です";
   if (!data.name || typeof data.name !== "string") return "nameが不正です";
-  if (!data.price || isNaN(Number(data.price))) return "priceが不正です";
+  // 金額0円を許容するため、未入力(空文字/undefined/null)かどうかとNaNかどうかを別にチェックする
+  if (data.price === "" || data.price == null || isNaN(Number(data.price)))
+    return "priceが不正です";
   if (!ITEM_TYPES.includes(data.type)) return "typeが不正です";
   if (
     !data.category ||
