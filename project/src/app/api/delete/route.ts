@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
+import { validateId } from "@/lib/validate";
 
 // Edge Runtimeで動かす理由は src/app/api/insert/route.ts のコメント・CLAUDE.md参照
 export const runtime = "edge";
@@ -13,15 +14,16 @@ export async function DELETE(request: Request) {
   let data;
   try {
     data = await request.json();
-  } catch (e) {
+  } catch {
     return NextResponse.json({
       success: false,
       error: "JSONのパースに失敗しました",
     });
   }
 
-  if (!data?.id || isNaN(Number(data.id))) {
-    return NextResponse.json({ success: false, error: "idが不正です" });
+  const validationError = validateId(data);
+  if (validationError) {
+    return NextResponse.json({ success: false, error: validationError });
   }
 
   // DB接続文字列を取得
@@ -47,7 +49,7 @@ export async function DELETE(request: Request) {
       });
     }
     return NextResponse.json({ success: true });
-  } catch (e: any) {
-    return NextResponse.json({ success: false, error: e?.toString() });
+  } catch (e: unknown) {
+    return NextResponse.json({ success: false, error: String(e) });
   }
 }

@@ -24,6 +24,14 @@ jobs:
         run: yarn install
         working-directory: project
 
+      - name: Run lint
+        run: yarn lint
+        working-directory: project
+
+      - name: Run tests
+        run: yarn test
+        working-directory: project
+
       - name: Run build
         run: yarn build
         working-directory: project
