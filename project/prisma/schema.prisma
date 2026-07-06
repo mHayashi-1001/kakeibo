@@ -14,11 +14,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }   
 
+// 家計簿の1件の収支レコード。
+// このスキーマ・マイグレーションはDB構造管理のためだけに使っており、
+// 実際のAPI(insert/update/search/delete)はEdge Runtime対応のためPrisma Clientではなくneon()直SQLを使っている(詳細はCLAUDE.md参照)
 model item {
   id       Int      @id @default(autoincrement())
   date     DateTime
   name     String
   price    Int
-  category String   @default("その他")
-  type     String   @default("支出")
+  category String   @default("その他") // src/lib/categories.tsのCATEGORIES_BY_TYPEと対応
+  type     String   @default("支出") // "支出" または "収入" (src/lib/categories.tsのITEM_TYPES)
 }

@@ -1,5 +1,8 @@
 "use client";
 
+// 一覧画面(/list)。/api/searchで取得した一覧を表示し、行クリックでその場編集(/api/update)、
+// 削除ボタンで削除(/api/delete)できる。収入/支出/差引の合計サマリーも表示する
+
 // スタイルをオブジェクトで管理
 const styles = {
   title: "text-xl font-bold mb-4",

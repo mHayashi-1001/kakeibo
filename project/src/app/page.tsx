@@ -1,3 +1,4 @@
+// トップページ。入力画面(/entry)と一覧画面(/list)へのリンクカードを並べるだけのシンプルな構成
 export default function Home() {
   return (
     <div className="flex flex-col items-center text-center gap-10 py-12">
