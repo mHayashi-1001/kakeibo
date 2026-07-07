@@ -29,7 +29,7 @@ kakeiboのGitワークフロー(CLAUDE.md参照)を実行するスキル。GitHu
 2. リモートにpushする: `git push -u origin feature/#<issue番号>`
 3. PR本文に必ず `Closes #<issue番号>` を含め、何を・なぜ変更したかを簡潔にまとめる。
 4. `gh pr create --title "..." --body "$(cat <<'EOF' ... EOF)"` の形式でPRを作成する。
-5. CIは`.github/workflows/pr-build.yml`が`project/`で`yarn build`を実行する。事前に`project/`で`yarn build`を実行し、通ることを確認してからPRを作成するとやり直しが減る。
+5. CIは`.github/workflows/pr-build.yml`が`project/`で`yarn lint`・`yarn test`・`yarn build`を順に実行する。事前に`project/`でこの3つを実行し、通ることを確認してからPRを作成するとやり直しが減る。
 
 ## 注意
 

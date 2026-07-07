@@ -16,10 +16,11 @@ yarn dev          # next dev --turbopack, http://localhost:3000
 yarn build        # next build(PRの必須CIチェックと同じ)
 yarn start
 yarn lint
+yarn test         # vitest run。src/lib配下のロジック(validate.ts/categories.ts)のユニットテスト
 npx tsc --noEmit  # 型チェック。専用スクリプトはない
 ```
 
-このリポジトリにテストスイートはない。
+`yarn lint`・`yarn test`・`yarn build`はいずれも`.github/workflows/pr-build.yml`のPR必須チェック。Edge Runtime依存(`neon()`経由)のAPIルート自体はテスト対象外(詳細は後述)。
 
 Prisma(スキーマ・マイグレーション管理のみ。ランタイムで使わない理由は後述):
 
@@ -64,9 +65,11 @@ Edge Runtime(実際のCloudflare Workersも、Next.jsのローカル開発用サ
 
 - `src/app/page.tsx` — トップページ。`/entry`と`/list`へのリンク
 - `src/app/entry/page.tsx` — 収支を追加するフォーム(クライアントコンポーネント、`/api/insert`にPOST)
-- `src/app/list/page.tsx` — 一覧画面。行をクリックしてその場編集(`/api/update`/`/api/delete`を呼ぶ)、収入/支出/差引の合計サマリー表示
+- `src/app/list/page.tsx` — 一覧画面。行をクリックしてその場編集(`/api/update`/`/api/delete`を呼ぶ)、月別絞り込み・内容検索・並び替え(日付/金額)、収入/支出/差引の合計サマリー表示
 - `src/app/api/{search,insert,update,delete}/route.ts` — `item`テーブル(`id`, `date`, `name`, `price`, `category`, `type`)に対するCRUD
+- `src/lib/validate.ts` — insert/update/delete共通のバリデーション(`validateItemFields`/`validateId`)。ユニットテスト(`validate.test.ts`)あり
 - `src/lib/categories.ts` — 収支種別`ITEM_TYPES`(収入/支出)とカテゴリ候補`CATEGORIES_BY_TYPE`を共有定義。APIのバリデーションとentry/list画面のUI両方から参照することで、クライアント/サーバー間でカテゴリの許容値がずれないようにしている
+- `src/components/CategoryBarChart.tsx` — /list画面のカテゴリ別集計を表示する横棒グラフ(単色・直接ラベル。詳細は`docs/react-basics.md`ではなくdataviz skillの方針を参照)
 - `src/app/layout.tsx` — 全ページ共通のヘッダー・ナビゲーション
 
 APIルートは全て `{ success: boolean, ... }` 形式のJSONを返す。失敗時は `{ success: false, error: string }` をHTTP 200で返す(エラーステータスコードは使わない)。
