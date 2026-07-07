@@ -74,3 +74,23 @@ APIルートは全て `{ success: boolean, ... }` 形式のJSONを返す。失�
 ## Gitワークフロー
 
 GitHub Flow: GitHub Issueに対応する `feature/#<issue番号>` という名前のブランチ(例: `feature/#15`)を切り、`main`へPRを出す。`main`はブランチ保護されており、直pushは禁止、ビルド成功(`.github/workflows/pr-build.yml`、`project/`で`yarn build`を実行)が必須。PR本文で `Closes #N` によりissueを参照する。
+
+## Claude Code用のAgents / Skills
+
+このリポジトリ専用のサブエージェント(`.claude/agents/`)とスキル(`.claude/skills/`)。それぞれ次の役割分担で使う。判断・レビューが必要なものはAgent、手順が決まっているものはSkillにしている。新しく追加・変更したときはこの表も合わせて更新すること。
+
+### Agents(`.claude/agents/*.md`)
+
+| 名前 | 用途 | 使うタイミング |
+|---|---|---|
+| `db-safety-guardian` | DBに触れるコマンド(`prisma migrate`、使い捨てスクリプト、`docker exec`経由の操作など)が本番Neonとローカルのどちらに接続するか判定し、危険なら警告する | `prisma migrate`系コマンドや、DB接続を含むスクリプトを実行する前に必ず |
+| `react-tutor` | 実装したコードに含まれるReact/Next.js特有の概念を学習者向けに解説する(コード変更はしない) | 機能実装後の解説依頼や「これは何をしてるの」系の質問時 |
+
+### Skills(`.claude/skills/<name>/SKILL.md`)
+
+| 名前 | 用途 | 使うタイミング |
+|---|---|---|
+| `feature-branch` | `feature/#<issue番号>`ブランチの作成〜`Closes #N`を含むPR作成までを一貫して行う | Issue対応の作業を開始する時、PRを出す時 |
+| `new-api-route` | 既存4ルート(`search`/`insert`/`update`/`delete`)の規約(Edge Runtime、`neon()`、`{ success, ... }`形式、`src/lib/validate.ts`のバリデーション再利用)に沿って新規APIルートを雛形作成する | `item`テーブルや新テーブルに対するAPIエンドポイントを追加する時 |
+
+いずれもこのリポジトリ固有の制約(本番DB分離なし、Edge Runtime縛り、Gitワークフロー)を前提にしているため、CLAUDE.md本文の該当セクションを変更したときは、対応するAgent/Skillの記述が古くならないよう見直すこと。
