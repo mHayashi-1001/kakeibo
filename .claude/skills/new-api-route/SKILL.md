@@ -24,7 +24,7 @@ description: kakeiboの既存のCRUD API規約(Edge Runtime、@neondatabase/serv
 2. `src/app/api/<新ルート名>/route.ts` を作成し、上記の規約に沿って実装する。HTTPメソッドは操作に応じて選ぶ(参照系はGET、作成はPOST、更新はPUT、削除はDELETE)。
 3. `item`テーブルにない列やテーブルを新たに使う場合は、`prisma/schema.prisma`にモデルを追加し、`npx prisma migrate dev --name <name>`でローカルにマイグレーションを作成する(本番への適用は別途ユーザー確認の上で行う。db-safety-guardianエージェントも参照)。
 4. フロントエンドから呼ぶ場合は、呼び出し側でも`{ success, error }`形式のレスポンスを想定したエラーハンドリングを行う。
-5. このリポジトリにテストスイートはないため、`project/`で`npx tsc --noEmit`と`yarn build`を実行して型・ビルドエラーがないことを確認する。実際に`yarn dev`で叩いて動作確認するとなお良い。
+5. `project/`で`npx tsc --noEmit`・`yarn lint`・`yarn test`・`yarn build`を実行してエラーがないことを確認する。`src/lib/validate.ts`に新しいバリデーションを追加した場合は、`validate.test.ts`に倣ってユニットテストも追加する。実際に`yarn dev`で叩いて動作確認するとなお良い。
 
 ## 注意
 
