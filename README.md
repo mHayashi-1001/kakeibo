@@ -8,6 +8,7 @@
 
 - [docs/react-basics.md](./docs/react-basics.md) — このアプリの実際のコードを使って、Reactの基本的な考え方(コンポーネント・state・propsなど)を説明しています
 - [docs/claude-code-basics.md](./docs/claude-code-basics.md) — `CLAUDE.md`やAgents/Skillsなど、Claude Codeがこのリポジトリを扱うための仕組みを説明しています
+- [docs/development-flow.md](./docs/development-flow.md) — 各ドキュメントの役割と、Issue作成からPRマージまでの開発の流れをまとめています
 
 ## 機能
 
