@@ -20,6 +20,9 @@ const styles = {
   summaryBalance: "text-lg font-bold",
   chartCard:
     "grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm",
+  trendCard:
+    "mb-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm",
+  trendTitle: "text-sm font-semibold text-slate-600 dark:text-slate-300 mb-3",
   tableWrap:
     "rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden",
   table: "w-full text-sm",
@@ -55,6 +58,7 @@ const styles = {
 import React, { useEffect, useMemo, useState } from "react";
 import { CATEGORIES_BY_TYPE, ITEM_TYPES, ItemType } from "@/lib/categories";
 import { CategoryBarChart } from "@/components/CategoryBarChart";
+import { MonthlyTrendChart } from "@/components/MonthlyTrendChart";
 
 // APIから取得の型定義
 type Item = {
@@ -136,6 +140,23 @@ export default function EntryList() {
     const months = new Set(items.map((item) => toMonthKey(item.date)));
     months.add(toMonthKey(new Date().toISOString()));
     return Array.from(months).sort((a, b) => (a < b ? 1 : -1));
+  }, [items]);
+
+  // 月ごとの収入・支出推移(絞り込みの影響を受けず、常に全期間のデータが対象)
+  const monthlyTotals = useMemo(() => {
+    const totals = new Map<string, { income: number; expense: number }>();
+    for (const item of items) {
+      const month = toMonthKey(item.date);
+      const current = totals.get(month) ?? { income: 0, expense: 0 };
+      if (item.type === "収入") current.income += item.price;
+      else current.expense += item.price;
+      totals.set(month, current);
+    }
+    return Array.from(totals, ([month, { income, expense }]) => ({
+      month,
+      income,
+      expense,
+    })).sort((a, b) => (a.month < b.month ? -1 : 1));
   }, [items]);
 
   // 月・検索の絞り込みを適用した一覧
@@ -306,6 +327,13 @@ export default function EntryList() {
               <option value="price-asc">金額が低い順</option>
             </select>
           </div>
+
+          {monthlyTotals.length > 0 && (
+            <div className={styles.trendCard}>
+              <div className={styles.trendTitle}>月次推移(全期間)</div>
+              <MonthlyTrendChart data={monthlyTotals} />
+            </div>
+          )}
 
           <div className={styles.summaryCard}>
             <div>
