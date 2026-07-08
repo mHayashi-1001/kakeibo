@@ -50,6 +50,12 @@ export default function RootLayout({
               >
                 一覧
               </Link>
+              <Link
+                href="/budget"
+                className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+              >
+                予算
+              </Link>
             </nav>
           </div>
         </header>

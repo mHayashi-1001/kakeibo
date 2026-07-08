@@ -59,6 +59,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { CATEGORIES_BY_TYPE, ITEM_TYPES, ItemType } from "@/lib/categories";
 import { CategoryBarChart } from "@/components/CategoryBarChart";
 import { MonthlyTrendChart } from "@/components/MonthlyTrendChart";
+import { BudgetProgress } from "@/components/BudgetProgress";
 
 // APIから取得の型定義
 type Item = {
@@ -107,6 +108,9 @@ export default function EntryList() {
   // 保存・削除時のエラーメッセージ
   const [actionError, setActionError] = useState("");
 
+  // カテゴリ -> 予算額(/budget画面で設定されたもの。未設定のカテゴリは含まれない)
+  const [budgets, setBudgets] = useState<Record<string, number>>({});
+
   useEffect(() => {
     // 関数の実行タイミングをReactのレンダリング後まで遅らせる
     // 非同期関数
@@ -133,6 +137,27 @@ export default function EntryList() {
       }
     };
     fetchData(); // データ取得実行
+  }, []);
+
+  useEffect(() => {
+    // 予算取得の失敗は一覧表示自体をブロックしない(予算進捗が出ないだけにする)ため、
+    // items取得とは別のuseEffectにしてエラーを分離している
+    const fetchBudgets = async () => {
+      try {
+        const res = await fetch("/api/budget-search");
+        const data = await res.json();
+        if (data.success) {
+          const map: Record<string, number> = {};
+          for (const b of data.budgets as { category: string; amount: number }[]) {
+            map[b.category] = b.amount;
+          }
+          setBudgets(map);
+        }
+      } catch {
+        // 何もしない(予算未取得のまま進捗非表示になるだけ)
+      }
+    };
+    fetchBudgets();
   }, []);
 
   // 一覧に登場する月の一覧(新しい順)。データがない当月分も選べるよう別途追加する
@@ -275,6 +300,24 @@ export default function EntryList() {
     return Array.from(totals, ([category, total]) => ({ category, total }));
   };
 
+  // 予算消化状況(予算は「1ヶ月あたり」の概念なので、月を1つに絞り込んでいるときだけ計算する)
+  const budgetStatuses = useMemo(() => {
+    if (selectedMonth === "all") return [];
+    const spentByCategory = new Map<string, number>();
+    for (const item of filteredItems) {
+      if (item.type !== "支出") continue;
+      spentByCategory.set(
+        item.category,
+        (spentByCategory.get(item.category) ?? 0) + item.price
+      );
+    }
+    return Object.entries(budgets).map(([category, budget]) => ({
+      category,
+      budget,
+      spent: spentByCategory.get(category) ?? 0,
+    }));
+  }, [budgets, filteredItems, selectedMonth]);
+
   // 画面描画
   return (
     <div>
@@ -355,6 +398,12 @@ export default function EntryList() {
               </div>
             </div>
           </div>
+
+          {budgetStatuses.length > 0 && (
+            <div className={styles.trendCard}>
+              <BudgetProgress data={budgetStatuses} />
+            </div>
+          )}
 
           {(totalExpense > 0 || totalIncome > 0) && (
             <div className={styles.chartCard}>

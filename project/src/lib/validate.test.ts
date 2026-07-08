@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateId, validateItemFields } from "./validate";
+import { validateBudget, validateId, validateItemFields } from "./validate";
 
 describe("validateItemFields", () => {
   const valid = {
@@ -68,5 +68,32 @@ describe("validateId", () => {
 
   it("idが数値でない場合はエラーを返す", () => {
     expect(validateId({ id: "abc" })).not.toBeNull();
+  });
+});
+
+describe("validateBudget", () => {
+  it("支出カテゴリと0以上の金額ではnullを返す", () => {
+    expect(validateBudget({ category: "食費", amount: 40000 })).toBeNull();
+    expect(validateBudget({ category: "食費", amount: 0 })).toBeNull();
+    expect(validateBudget({ category: "食費", amount: "0" })).toBeNull();
+  });
+
+  it("収入カテゴリを指定した場合はエラーを返す", () => {
+    // "給与"は収入用のカテゴリであり、予算の対象は支出カテゴリのみ
+    expect(validateBudget({ category: "給与", amount: 1000 })).not.toBeNull();
+  });
+
+  it("存在しないカテゴリの場合はエラーを返す", () => {
+    expect(validateBudget({ category: "謎", amount: 1000 })).not.toBeNull();
+  });
+
+  it.each([
+    ["空文字", ""],
+    ["undefined", undefined],
+    ["null", null],
+    ["数値でない文字列", "abc"],
+    ["負の値", -1],
+  ])("amountが%s(%s)の場合はエラーを返す", (_label, amount) => {
+    expect(validateBudget({ category: "食費", amount })).not.toBeNull();
   });
 });

@@ -30,3 +30,20 @@ export function validateId(data: Record<string, unknown> | null | undefined): st
   if (!data?.id || isNaN(Number(data.id))) return "idが不正です";
   return null;
 }
+
+/**
+ * 予算(category/amount)の入力チェック(budget-upsert/budget-delete共通)。
+ * 問題があればエラーメッセージ(文字列)を、問題なければnullを返す
+ */
+export function validateBudget(
+  data: Record<string, unknown> | null | undefined
+): string | null {
+  if (!data) return "データがありません";
+  if (!CATEGORIES_BY_TYPE.支出.includes(data.category as string))
+    return "categoryが不正です";
+  // 金額0円を許容するため、未入力かどうかとNaN・負の値かどうかを別にチェックする
+  if (data.amount === "" || data.amount == null || isNaN(Number(data.amount)))
+    return "amountが不正です";
+  if (Number(data.amount) < 0) return "amountが不正です";
+  return null;
+}

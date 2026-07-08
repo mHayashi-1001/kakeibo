@@ -25,3 +25,10 @@ model item {
   category String   @default("その他") // src/lib/categories.tsのCATEGORIES_BY_TYPEと対応
   type     String   @default("支出") // "支出" または "収入" (src/lib/categories.tsのITEM_TYPES)
 }
+
+// 支出カテゴリごとの継続的な月間予算。月ごとの実績と突き合わせて/list画面に進捗表示する。
+// 予算は任意設定なので、このテーブルに行がないカテゴリは「未設定」を意味する。
+model budget {
+  category String @id // src/lib/categories.tsのCATEGORIES_BY_TYPE.支出のいずれか
+  amount   Int
+}
