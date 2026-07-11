@@ -87,7 +87,7 @@ GitHub Flow: GitHub Issueに対応する `feature/#<issue番号>` という名�
 | 名前 | 用途 | 使うタイミング |
 |---|---|---|
 | `db-safety-guardian` | DBに触れるコマンド(`prisma migrate`、使い捨てスクリプト、`docker exec`経由の操作など)が本番Neonとローカルのどちらに接続するか判定し、危険なら警告する | `prisma migrate`系コマンドや、DB接続を含むスクリプトを実行する前に必ず |
-| `react-tutor` | 実装したコードに含まれるReact/Next.js特有の概念を学習者向けに解説する(コード変更はしない) | 機能実装後の解説依頼や「これは何をしてるの」系の質問時 |
+| `react-tutor` | 実装したコードに含まれるReact/Next.js特有の概念を学習者向けに解説する。データ・処理の流れはMermaid図、抽象概念は身近なたとえ話で補足する(コード変更はしない) | 機能実装後の解説依頼や「これは何をしてるの」系の質問時 |
 
 ### Skills(`.claude/skills/<name>/SKILL.md`)
 
