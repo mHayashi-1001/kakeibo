@@ -58,12 +58,14 @@ export default function BudgetSettings() {
   }, []);
 
   const handleChange = (category: string, value: string) => {
-    setAmounts({ ...amounts, [category]: value });
+    // 直前のstateを関数で受け取って更新する(状態更新のたびに再定義されるamountsを
+    // 参照するとクロージャが古い値を指すことがあるため、常に最新のprevから作る)
+    setAmounts((prev) => ({ ...prev, [category]: value }));
   };
 
   // 保存: 金額が入力されていればupsert、空ならdelete(未設定に戻す)
   const save = async (category: string) => {
-    setMessages({ ...messages, [category]: "" });
+    setMessages((prev) => ({ ...prev, [category]: "" }));
     const value = amounts[category] ?? "";
 
     const res =
@@ -80,10 +82,12 @@ export default function BudgetSettings() {
           });
 
     const data = await res.json();
-    setMessages({
-      ...messages,
+    // await をまたぐのでmessagesのクロージャは特に古くなりやすい。関数形式の更新で
+    // 他カテゴリを同時に保存した場合の上書き事故を防ぐ
+    setMessages((prev) => ({
+      ...prev,
       [category]: data.success ? "保存しました" : data.error ?? "保存に失敗しました",
-    });
+    }));
   };
 
   return (
