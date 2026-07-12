@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>モック: 収支入力(/entry)</title>
+<style>
+  :root {
+    --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0;
+    --text: #0f172a; --muted: #64748b; --indigo: #4f46e5; --indigo-dark: #4338ca;
+    --rose: #f43f5e; --emerald: #10b981;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text);
+  }
+  header {
+    border-bottom: 1px solid var(--border); background: rgba(255,255,255,.9);
+    padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+    max-width: 768px; margin: 0 auto;
+  }
+  .brand { font-weight: 700; color: var(--indigo); text-decoration: none; }
+  nav a { margin-left: 16px; color: var(--muted); text-decoration: none; font-size: 14px; }
+  nav a.active { color: var(--indigo); font-weight: 600; }
+  main { max-width: 768px; margin: 0 auto; padding: 32px 16px; }
+  .card {
+    max-width: 420px; margin: 0 auto; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.04); padding: 24px;
+  }
+  h1 { font-size: 20px; text-align: center; margin: 0 0 20px; }
+  .field { margin-bottom: 16px; }
+  .label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 4px; }
+  .input, select {
+    width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px;
+    font-size: 14px; background: #fff; color: var(--text);
+  }
+  .type-row { display: flex; gap: 8px; }
+  .type-btn {
+    flex: 1; text-align: center; border-radius: 6px; padding: 8px 0; font-size: 14px;
+    font-weight: 600; border: 1px solid #cbd5e1; color: var(--muted); background: #fff;
+  }
+  .type-btn.expense-active { background: var(--rose); border-color: var(--rose); color: #fff; }
+  .submit-btn {
+    width: 100%; background: var(--indigo); color: #fff; border: none; border-radius: 6px;
+    padding: 10px 0; font-size: 14px; font-weight: 600; margin-top: 8px;
+  }
+  .message {
+    margin-top: 12px; text-align: center; font-size: 13px; padding: 8px; border-radius: 6px;
+    background: #ecfdf5; color: #047857;
+  }
+  .note { max-width: 420px; margin: 16px auto 0; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="#">家計簿</a>
+    <nav>
+      <a class="active" href="#">入力</a>
+      <a href="#">一覧</a>
+      <a href="#">予算</a>
+    </nav>
+  </header>
+  <main>
+    <div class="card">
+      <h1>収支を入力</h1>
+
+      <div class="field">
+        <span class="label">収支種別</span>
+        <div class="type-row">
+          <div class="type-btn expense-active">支出</div>
+          <div class="type-btn">収入</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">カテゴリ</label>
+        <select><option>食費</option><option>日用品</option><option>交通費</option></select>
+      </div>
+
+      <div class="field">
+        <label class="label">日付</label>
+        <input class="input" type="text" value="2026-07-01">
+      </div>
+
+      <div class="field">
+        <label class="label">内容</label>
+        <input class="input" type="text" value="スーパーで買い物">
+      </div>
+
+      <div class="field">
+        <label class="label">金額</label>
+        <input class="input" type="text" value="3200">
+      </div>
+
+      <button class="submit-btn">登録する</button>
+      <div class="message">送信成功！</div>
+    </div>
+    <p class="note">※ これはdocs/design/entry.mdの画面レイアウトを再現した静的モックで、実際の操作(送信・API通信)はできません。</p>
+  </main>
+</body>
+</html>

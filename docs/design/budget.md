@@ -18,6 +18,21 @@
 
 行ごとに独立して保存できる(フォーム全体の一括送信ではない)。
 
+## 画面レイアウト
+
+HTMLモック: [mockups/budget.html](./mockups/budget.html)(ブラウザで直接開いて見た目を確認できる。実際の保存・API通信はしない静的モック)
+
+説明文の下に、支出カテゴリ12個分の行(カテゴリ名 + 金額入力欄 + 保存ボタン)が並ぶ。未設定のカテゴリは入力欄がplaceholder「未設定」の空欄になる。保存すると、その行の下にだけ結果メッセージが表示される。
+
+## 項目定義
+
+| No | 項目名 | state キー | 型/属性 | 桁数 | 必須 | 初期値 |
+|---|---|---|---|---|---|---|
+| 1 | カテゴリ(表示のみ) | `EXPENSE_CATEGORIES`(`CATEGORIES_BY_TYPE.支出`) | 文字列(列挙、固定12種) | 2〜4文字 | — | — (編集不可、行の見出し) |
+| 2 | 予算額 | `amounts[category]` / `budget.amount` | 文字列→整数(`INTEGER`) | 上限なし(DB上は32bit整数) | - (空欄可。空欄=未設定) | `""`(未設定時) |
+
+`budget`テーブルの主キーは`category`そのもの(サロゲートIDなし)。1カテゴリにつき最大1行。
+
 ## 状態管理
 
 | state | 型 | 役割 |
@@ -43,6 +58,63 @@ flowchart TD
     E --> F
 ```
 
+## チェック処理仕様
+
+実装: [project/src/lib/validate.ts](../../project/src/lib/validate.ts) の `validateBudget`(`PUT /api/budget-upsert`でのみ使用)。`DELETE /api/budget-delete`は専用の簡易チェックのみ行う。
+
+### `PUT /api/budget-upsert`
+
+| No | チェック項目 | 内容 | エラーメッセージ |
+|---|---|---|---|
+| 1 | データ有無 | リクエストボディが存在すること | `データがありません` |
+| 2 | カテゴリ整合性 | `category`が`CATEGORIES_BY_TYPE.支出`の候補に含まれること(収入カテゴリは不可) | `categoryが不正です` |
+| 3 | 金額形式 | `amount`が空文字/`null`/`undefined`でなく数値に変換できること(`0`は許容) | `amountが不正です` |
+| 4 | 金額範囲 | `amount`が0以上であること(負数不可) | `amountが不正です` |
+
+### `DELETE /api/budget-delete`
+
+| No | チェック項目 | 内容 | エラーメッセージ |
+|---|---|---|---|
+| 1 | カテゴリ整合性 | `category`が存在し、`CATEGORIES_BY_TYPE.支出`の候補に含まれること | `categoryが不正です` |
+
+## DB更新仕様
+
+対象テーブル: `budget`(主キー`category`のみのシンプルなテーブル)
+
+### `PUT /api/budget-upsert` — カラム単位の設定内容
+
+upsert(`category`が既存行にあれば`amount`を上書き、なければ新規1行作成)。
+
+| カラム | 設定するか | 設定値 | 備考 |
+|---|---|---|---|
+| `category` | する | リクエストの`category` | 主キー。`ON CONFLICT`の判定に使用 |
+| `amount` | する | リクエストの`amount` | `Number.parseInt`で整数に変換してから格納。既存行があれば上書き |
+
+| 項目 | 内容 |
+|---|---|
+| 参考: 実行SQL | `INSERT INTO budget (category, amount) VALUES ($1, $2) ON CONFLICT (category) DO UPDATE SET amount = $2` |
+| 実行環境 | Edge Runtime + `neon()`(本番Neon DBのみ) |
+
+### `DELETE /api/budget-delete` — 削除内容
+
+検索条件(WHERE): `category = リクエストのcategory`。更新対象カラムはなし(行そのものを削除)。
+
+| 項目 | 内容 |
+|---|---|
+| 参考: 実行SQL | `DELETE FROM budget WHERE category = $1` |
+| 0件時の扱い | エラーにしない。元々未設定(0件)でも、削除後も「未設定」で状態は変わらないため |
+| 実行環境 | Edge Runtime + `neon()`(本番Neon DBのみ) |
+
+### `GET /api/budget-search` — 取得内容
+
+| カラム | SELECTするか |
+|---|---|
+| `category`, `amount` | する(全カラム) |
+
+| 項目 | 内容 |
+|---|---|
+| 参考: 実行SQL | `SELECT category, amount FROM budget ORDER BY category` |
+
 ## API仕様
 
 ### `GET /api/budget-search`
@@ -53,12 +125,11 @@ flowchart TD
 
 ### `PUT /api/budget-upsert`
 リクエスト: `{ "category": "食費", "amount": "40000" }`
-バリデーション(`validateBudget`): `category`が支出カテゴリの候補に含まれること、`amount`が0以上の数値であること。
-DB操作: `INSERT INTO budget (category, amount) VALUES (...) ON CONFLICT (category) DO UPDATE SET amount = ...`(既にあれば上書き、なければ新規作成)
+レスポンス(成功時): `{ "success": true }`
 
 ### `DELETE /api/budget-delete`
 リクエスト: `{ "category": "食費" }`
-DB操作: `DELETE FROM budget WHERE category = ...`。対象行が元々0件でも(=既に未設定でも)エラーにはしない(結果的に「未設定」という状態は変わらないため)。
+レスポンス(成功時): `{ "success": true }`
 
 ## list画面との連携
 
