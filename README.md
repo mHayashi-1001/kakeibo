@@ -9,13 +9,17 @@
 - [docs/react-basics.md](./docs/react-basics.md) — このアプリの実際のコードを使って、Reactの基本的な考え方(コンポーネント・state・propsなど)を説明しています
 - [docs/claude-code-basics.md](./docs/claude-code-basics.md) — `CLAUDE.md`やAgents/Skillsなど、Claude Codeがこのリポジトリを扱うための仕組みを説明しています
 - [docs/development-flow.md](./docs/development-flow.md) — 各ドキュメントの役割と、Issue作成からPRマージまでの開発の流れをまとめています
+- [docs/design/](./docs/design/) — 各機能の設計書(画面構成・データ設計・API仕様・処理フロー)
 
 ## 機能
 
 - 収支の入力(日付・内容・金額・収支種別・カテゴリ)
 - 一覧表示(行クリックでその場編集、削除)
 - 月別の絞り込み・内容検索・並び替え
-- 収入・支出・差引の合計サマリー、カテゴリ別集計グラフ
+- 収入・支出・差引の合計サマリー、カテゴリ別集計グラフ、月次推移グラフ
+- カテゴリごとの予算設定・消化状況の表示
+
+各機能の詳細は [docs/design/](./docs/design/) を参照してください。
 
 ## フォルダ構成
 
