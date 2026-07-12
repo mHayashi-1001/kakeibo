@@ -6,7 +6,9 @@
 
 登録済みの収支を一覧表示し、絞り込み・検索・並び替え・その場編集・削除・各種集計グラフを行う、このアプリで最も機能が多い画面。
 
-関連ファイル: [project/src/app/list/page.tsx](../../project/src/app/list/page.tsx)、[project/src/components/CategoryBarChart.tsx](../../project/src/components/CategoryBarChart.tsx)、[project/src/components/MonthlyTrendChart.tsx](../../project/src/components/MonthlyTrendChart.tsx)、[project/src/components/BudgetProgress.tsx](../../project/src/components/BudgetProgress.tsx)
+関連ファイル:
+- フロントエンド: [project/src/app/list/page.tsx](../../project/src/app/list/page.tsx)、[project/src/components/CategoryBarChart.tsx](../../project/src/components/CategoryBarChart.tsx)、[project/src/components/MonthlyTrendChart.tsx](../../project/src/components/MonthlyTrendChart.tsx)、[project/src/components/BudgetProgress.tsx](../../project/src/components/BudgetProgress.tsx)
+- バックエンド: [project/src/app/api/search/route.ts](../../project/src/app/api/search/route.ts)、[project/src/app/api/update/route.ts](../../project/src/app/api/update/route.ts)、[project/src/app/api/delete/route.ts](../../project/src/app/api/delete/route.ts)、[project/src/app/api/budget-search/route.ts](../../project/src/app/api/budget-search/route.ts)
 
 ## 画面構成(上から順)
 
