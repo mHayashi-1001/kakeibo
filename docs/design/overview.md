@@ -4,15 +4,27 @@
 
 ## システム構成
 
+デプロイ先(Cloudflare Pages)は1つだが、コードの役割としてはフロントエンドとバックエンドに分離されている。**フロントエンドはDBに直接アクセスせず、必ずバックエンド(APIルート)を`fetch`経由で呼び出す。**
+
 ```mermaid
 flowchart LR
-    Browser["ブラウザ<br/>(React クライアントコンポーネント)"]
-    API["Next.js APIルート<br/>src/app/api/**/route.ts<br/>(Edge Runtime)"]
+    subgraph FE["フロントエンド(ブラウザで実行)"]
+        Browser["React クライアントコンポーネント<br/>src/app/*/page.tsx<br/>src/components/*.tsx"]
+    end
+    subgraph BE["バックエンド(Edge Runtimeで実行)"]
+        API["Next.js APIルート<br/>src/app/api/**/route.ts"]
+    end
     Neon["Neon Postgres<br/>(本番DB)"]
 
     Browser -- "fetch(JSON)" --> API
     API -- "neon() タグ付きSQL" --> Neon
 ```
+
+| 層 | 場所 | 役割 |
+|---|---|---|
+| フロントエンド | `src/app/*/page.tsx`、`src/components/*.tsx` | 画面表示・ユーザー操作の受付。`fetch`でバックエンドのAPIルートを呼ぶだけで、DBには触れない |
+| バックエンド | `src/app/api/**/route.ts` | リクエストのバリデーション、DBの読み書き(`neon()`で直接SQL実行) |
+| 共有ロジック | `src/lib/*.ts` | フロントエンド・バックエンドの**両方**から参照される定義(カテゴリ候補・バリデーション関数)。片方だけ変更して値がずれることを防ぐ |
 
 - 画面(`src/app/*/page.tsx`)はすべてクライアントコンポーネント(`"use client"`)。`fetch`でAPIルートを呼ぶ
 - APIルートは全て`export const runtime = "edge"`を宣言し、`@neondatabase/serverless`の`neon()`で直接SQLを実行する。Prisma Clientは使わない(理由は[../../CLAUDE.md](../../CLAUDE.md)参照)
@@ -47,7 +59,7 @@ flowchart LR
 - **[../../project/src/lib/categories.ts](../../project/src/lib/categories.ts)** — `ITEM_TYPES`(収支種別)・`CATEGORIES_BY_TYPE`(種別ごとのカテゴリ候補)を定義。フロントエンドの選択肢とAPIのバリデーションの両方がここを参照し、許容値がずれないようにしている
 - **[../../project/src/lib/validate.ts](../../project/src/lib/validate.ts)** — `validateItemFields`(name/price/type/category)・`validateId`・`validateBudget`(category/amount)。いずれも「問題があればエラー文字列、なければ`null`」という同じ形式
 
-## 共通API仕様
+## 共通API仕様(バックエンド)
 
 すべてのAPIルートは`{ success: boolean, ... }`形式のJSONを返す。
 
@@ -64,7 +76,7 @@ flowchart LR
 | `/api/budget-upsert` | PUT | budget作成/更新 | [budget.md](./budget.md) |
 | `/api/budget-delete` | DELETE | budget削除(未設定に戻す) | [budget.md](./budget.md) |
 
-## 画面一覧
+## 画面一覧(フロントエンド)
 
 | パス | 画面 | 設計書 |
 |---|---|---|

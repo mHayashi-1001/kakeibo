@@ -6,7 +6,9 @@
 
 収支(支出または収入)を1件登録するフォーム画面。送信すると`item`テーブルに1行追加される。
 
-関連ファイル: [project/src/app/entry/page.tsx](../../project/src/app/entry/page.tsx)、[project/src/app/api/insert/route.ts](../../project/src/app/api/insert/route.ts)
+関連ファイル:
+- フロントエンド: [project/src/app/entry/page.tsx](../../project/src/app/entry/page.tsx)
+- バックエンド: [project/src/app/api/insert/route.ts](../../project/src/app/api/insert/route.ts)
 
 ## 画面構成
 

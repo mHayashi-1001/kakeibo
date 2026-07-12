@@ -8,7 +8,9 @@
 
 対象は支出カテゴリのみ(収入に予算は設定しない)。予算は任意設定で、12個あるカテゴリすべてに強制しない。
 
-関連ファイル: [project/src/app/budget/page.tsx](../../project/src/app/budget/page.tsx)、[project/src/app/api/budget-search/route.ts](../../project/src/app/api/budget-search/route.ts)、[project/src/app/api/budget-upsert/route.ts](../../project/src/app/api/budget-upsert/route.ts)、[project/src/app/api/budget-delete/route.ts](../../project/src/app/api/budget-delete/route.ts)
+関連ファイル:
+- フロントエンド: [project/src/app/budget/page.tsx](../../project/src/app/budget/page.tsx)
+- バックエンド: [project/src/app/api/budget-search/route.ts](../../project/src/app/api/budget-search/route.ts)、[project/src/app/api/budget-upsert/route.ts](../../project/src/app/api/budget-upsert/route.ts)、[project/src/app/api/budget-delete/route.ts](../../project/src/app/api/budget-delete/route.ts)
 
 ## 画面構成
 
