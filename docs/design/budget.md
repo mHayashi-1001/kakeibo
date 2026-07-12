@@ -20,20 +20,9 @@
 
 ## 画面レイアウト
 
-```
-┌───────────────────────────────────┐
-│              予算設定                 │  h1 title
-│ カテゴリごとに毎月の予算額を設定できます。│  説明文
-│ 空欄で保存すると未設定に戻ります。       │
-├───────────────────────────────────┤
-│ 食費     [ 40000        ] [ 保存 ]   │  行1
-│  保存しました                         │  ← 保存後だけ表示
-│ 日用品   [ 未設定         ] [ 保存 ]   │  行2(未設定はplaceholder表示)
-│ 交通費   [ 8000          ] [ 保存 ]   │  行3
-│ 交際費   [ 未設定         ] [ 保存 ]   │  行4
-│  ...(支出カテゴリ12行分)               │
-└───────────────────────────────────┘
-```
+HTMLモック: [mockups/budget.html](./mockups/budget.html)(ブラウザで直接開いて見た目を確認できる。実際の保存・API通信はしない静的モック)
+
+説明文の下に、支出カテゴリ12個分の行(カテゴリ名 + 金額入力欄 + 保存ボタン)が並ぶ。未設定のカテゴリは入力欄がplaceholder「未設定」の空欄になる。保存すると、その行の下にだけ結果メッセージが表示される。
 
 ## 項目定義
 
@@ -90,27 +79,41 @@ flowchart TD
 
 ## DB更新仕様
 
-### `PUT /api/budget-upsert`
+対象テーブル: `budget`(主キー`category`のみのシンプルなテーブル)
+
+### `PUT /api/budget-upsert` — カラム単位の設定内容
+
+upsert(`category`が既存行にあれば`amount`を上書き、なければ新規1行作成)。
+
+| カラム | 設定するか | 設定値 | 備考 |
+|---|---|---|---|
+| `category` | する | リクエストの`category` | 主キー。`ON CONFLICT`の判定に使用 |
+| `amount` | する | リクエストの`amount` | `Number.parseInt`で整数に変換してから格納。既存行があれば上書き |
 
 | 項目 | 内容 |
 |---|---|
-| 実行SQL | `INSERT INTO budget (category, amount) VALUES ($1, $2) ON CONFLICT (category) DO UPDATE SET amount = $2` |
-| 更新方式 | upsert(`category`が既存なら`amount`を上書き、なければ新規1行作成) |
+| 参考: 実行SQL | `INSERT INTO budget (category, amount) VALUES ($1, $2) ON CONFLICT (category) DO UPDATE SET amount = $2` |
 | 実行環境 | Edge Runtime + `neon()`(本番Neon DBのみ) |
 
-### `DELETE /api/budget-delete`
+### `DELETE /api/budget-delete` — 削除内容
+
+検索条件(WHERE): `category = リクエストのcategory`。更新対象カラムはなし(行そのものを削除)。
 
 | 項目 | 内容 |
 |---|---|
-| 実行SQL | `DELETE FROM budget WHERE category = $1` |
+| 参考: 実行SQL | `DELETE FROM budget WHERE category = $1` |
 | 0件時の扱い | エラーにしない。元々未設定(0件)でも、削除後も「未設定」で状態は変わらないため |
 | 実行環境 | Edge Runtime + `neon()`(本番Neon DBのみ) |
 
-### `GET /api/budget-search`
+### `GET /api/budget-search` — 取得内容
+
+| カラム | SELECTするか |
+|---|---|
+| `category`, `amount` | する(全カラム) |
 
 | 項目 | 内容 |
 |---|---|
-| 実行SQL | `SELECT category, amount FROM budget ORDER BY category` |
+| 参考: 実行SQL | `SELECT category, amount FROM budget ORDER BY category` |
 
 ## API仕様
 

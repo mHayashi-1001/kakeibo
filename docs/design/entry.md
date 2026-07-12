@@ -23,25 +23,9 @@
 
 ## 画面レイアウト
 
-```
-┌─────────────────────────────────┐
-│           収支を入力               │  h1 title
-├─────────────────────────────────┤
-│ 収支種別  [ 支出 ] [ 収入 ]         │  ボタン2択(選択中は色付き)
-│                                   │
-│ カテゴリ  [ 食費            ▼ ]   │  select(typeに連動)
-│                                   │
-│ 日付      [ 2026-07-01       ]   │  input type="date"
-│                                   │
-│ 内容      [ スーパーで買い物   ]   │  input type="text"
-│                                   │
-│ 金額      [ 3200             ]   │  input inputMode="numeric"
-│                                   │
-│         [     登録する     ]      │  submit button
-│                                   │
-│   (送信成功！ / エラー発生: ...)   │  結果メッセージ(送信後のみ表示)
-└─────────────────────────────────┘
-```
+HTMLモック: [mockups/entry.html](./mockups/entry.html)(ブラウザで直接開いて見た目を確認できる。実際の送信・API通信はしない静的モック)
+
+上から「収支種別(ボタン2択)」→「カテゴリ(`type`に連動するselect)」→「日付」→「内容」→「金額」→「登録するボタン」→ 結果メッセージ(送信後のみ表示)の順に並ぶ、1カラムのカード型フォーム。
 
 ## 項目定義
 
@@ -102,12 +86,25 @@ sequenceDiagram
 
 ## DB更新仕様
 
+対象テーブル: `item`(INSERT、1回のリクエストで1行作成)
+
+### カラム単位の設定内容
+
+| カラム | 設定するか | 設定値 | 備考 |
+|---|---|---|---|
+| `id` | しない | — | `SERIAL`相当の自動採番。既存の最大値+1から採番される |
+| `date` | する | リクエストの`date` | 未指定時はAPI側で`new Date().toISOString()`(現在時刻)を補う |
+| `name` | する | リクエストの`name` | そのまま格納 |
+| `price` | する | リクエストの`price` | `Number.parseInt`で整数に変換してから格納 |
+| `category` | する | リクエストの`category` | そのまま格納(バリデーション済みの候補値) |
+| `type` | する | リクエストの`type` | そのまま格納(`"支出"`/`"収入"`) |
+
+### その他の仕様
+
 | 項目 | 内容 |
 |---|---|
-| 実行SQL | `INSERT INTO item (date, name, price, category, type) VALUES ($1, $2, $3, $4, $5) RETURNING id` |
-| 対象テーブル | `item` |
-| `id`の扱い | 指定しない(`SERIAL`相当の自動採番。既存の最大値+1から採番される) |
-| `date`の補完 | リクエストに`date`がなければ、API側で`new Date().toISOString()`(現在時刻)を使う |
+| 参考: 実行SQL | `INSERT INTO item (date, name, price, category, type) VALUES ($1, $2, $3, $4, $5) RETURNING id` |
+| 戻り値 | 新規作成された行の`id`(`RETURNING id`で取得し、レスポンスの`id`として返す) |
 | トランザクション | 単一INSERT文のみ。明示的なトランザクション制御なし |
 | 実行環境 | Edge Runtime + `neon()`(本番Neon DBに対してのみ動作。ローカルPostgresには接続不可。詳細は[../../CLAUDE.md](../../CLAUDE.md)) |
 | 異常系 | INSERT失敗時は`catch`で捕捉し`{ success: false, error: String(e) }`を返す(例: DB接続不可など) |

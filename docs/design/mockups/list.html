@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>モック: 一覧(/list)</title>
+<style>
+  :root {
+    --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0;
+    --text: #0f172a; --muted: #64748b; --indigo: #4f46e5;
+    --rose: #f43f5e; --rose-bg: #fff1f2; --emerald: #10b981; --emerald-bg: #ecfdf5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text); font-size: 14px;
+  }
+  header {
+    border-bottom: 1px solid var(--border); background: rgba(255,255,255,.9);
+    padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+    max-width: 900px; margin: 0 auto;
+  }
+  .brand { font-weight: 700; color: var(--indigo); text-decoration: none; }
+  nav a { margin-left: 16px; color: var(--muted); text-decoration: none; font-size: 14px; }
+  nav a.active { color: var(--indigo); font-weight: 600; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 20px; margin: 0 0 16px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04); padding: 16px; margin-bottom: 20px;
+  }
+  .card-title { font-size: 13px; font-weight: 600; color: #475569; margin: 0 0 10px; }
+
+  /* フィルタバー */
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-bar select, .filter-bar input {
+    border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px; font-size: 13px;
+  }
+
+  /* サマリー */
+  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .summary .label { font-size: 12px; color: var(--muted); }
+  .summary .income { font-size: 18px; font-weight: 700; color: var(--emerald); }
+  .summary .expense { font-size: 18px; font-weight: 700; color: var(--rose); }
+  .summary .balance { font-size: 18px; font-weight: 700; }
+
+  /* 予算メーター */
+  .meter-row { margin-bottom: 10px; }
+  .meter-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+  .meter-track { height: 10px; border-radius: 5px; background: var(--rose-bg); overflow: hidden; }
+  .meter-fill { height: 100%; background: var(--rose); border-radius: 0 5px 5px 0; }
+
+  /* カテゴリ横棒 */
+  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+  .bar-label { width: 56px; color: var(--muted); flex-shrink: 0; }
+  .bar-track { flex: 1; height: 18px; border-radius: 4px; background: #f1f5f9; overflow: hidden; }
+  .bar-fill-expense { height: 100%; background: var(--rose); border-radius: 0 4px 4px 0; }
+  .bar-fill-income { height: 100%; background: var(--emerald); border-radius: 0 4px 4px 0; }
+  .bar-value { width: 64px; text-align: right; color: #334155; flex-shrink: 0; }
+
+  /* テーブル */
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  .badge-expense { background: var(--rose-bg); color: #be123c; border-radius: 999px; padding: 2px 8px; font-size: 11px; }
+  .badge-income { background: var(--emerald-bg); color: #047857; border-radius: 999px; padding: 2px 8px; font-size: 11px; }
+  .amount-expense { color: #0f172a; font-weight: 500; }
+  .del-btn { border: 1px solid #fda4af; color: var(--rose); background: #fff; border-radius: 6px; padding: 3px 8px; font-size: 11px; }
+  .edit-row td { background: #fafafa; }
+  .edit-row input, .edit-row select { border: 1px solid #cbd5e1; border-radius: 5px; padding: 4px 6px; font-size: 12px; width: 100%; }
+  .save-btn { background: var(--indigo); color: #fff; border: none; border-radius: 6px; padding: 3px 8px; font-size: 11px; margin-right: 4px; }
+  .cancel-btn { background: #f1f5f9; color: #475569; border: none; border-radius: 6px; padding: 3px 8px; font-size: 11px; margin-right: 4px; }
+
+  .note { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="#">家計簿</a>
+    <nav>
+      <a href="#">入力</a>
+      <a class="active" href="#">一覧</a>
+      <a href="#">予算</a>
+    </nav>
+  </header>
+  <main>
+    <h1>一覧画面</h1>
+
+    <div class="card">
+      <div class="filter-bar">
+        <select><option>2026年7月</option></select>
+        <input type="text" placeholder="内容で検索">
+        <select><option>日付が新しい順</option></select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">月次推移(全期間)</div>
+      <svg viewBox="0 0 400 100" width="100%" height="100">
+        <polyline points="10,30 80,32 150,25 220,28 290,20 360,32" fill="none" stroke="#10b981" stroke-width="2"/>
+        <polyline points="10,70 80,60 150,80 220,65 290,40 360,75" fill="none" stroke="#f43f5e" stroke-width="2"/>
+        <text x="365" y="24" font-size="9" fill="#059669">250,000円</text>
+        <text x="365" y="79" font-size="9" fill="#e11d48">95,000円</text>
+      </svg>
+    </div>
+
+    <div class="card">
+      <div class="summary">
+        <div><div class="label">収入</div><div class="income">250,000円</div></div>
+        <div><div class="label">支出</div><div class="expense">180,000円</div></div>
+        <div><div class="label">差引</div><div class="balance">70,000円</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">今月の予算消化状況</div>
+      <div class="meter-row">
+        <div class="meter-label"><span>食費</span><span>32,000 / 40,000円</span></div>
+        <div class="meter-track"><div class="meter-fill" style="width:80%"></div></div>
+      </div>
+      <div class="meter-row">
+        <div class="meter-label"><span>交通費</span><span style="color:#e11d48;font-weight:600">12,000 / 8,000円(予算超過)</span></div>
+        <div class="meter-track"><div class="meter-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="charts">
+        <div>
+          <div class="card-title">カテゴリ別内訳(支出)</div>
+          <div class="bar-row"><span class="bar-label">食費</span><div class="bar-track"><div class="bar-fill-expense" style="width:80%"></div></div><span class="bar-value">32,000円</span></div>
+          <div class="bar-row"><span class="bar-label">交通費</span><div class="bar-track"><div class="bar-fill-expense" style="width:30%"></div></div><span class="bar-value">12,000円</span></div>
+        </div>
+        <div>
+          <div class="card-title">カテゴリ別内訳(収入)</div>
+          <div class="bar-row"><span class="bar-label">給与</span><div class="bar-track"><div class="bar-fill-income" style="width:100%"></div></div><span class="bar-value">250,000円</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:0;">
+      <table>
+        <thead>
+          <tr><th>日付</th><th>内容</th><th>カテゴリ</th><th>金額</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2026-07-01</td>
+            <td>スーパーで買い物</td>
+            <td><span class="badge-expense">食費</span></td>
+            <td class="amount-expense">-3,200円</td>
+            <td><button class="del-btn">削除</button></td>
+          </tr>
+          <tr class="edit-row">
+            <td><input type="text" value="2026-07-02"></td>
+            <td><input type="text" value="電車代"></td>
+            <td>
+              <select><option>支出</option></select>
+              <select style="margin-top:4px;"><option>交通費</option></select>
+            </td>
+            <td><input type="text" value="450"></td>
+            <td style="white-space:nowrap;">
+              <button class="save-btn">保存</button>
+              <button class="cancel-btn">キャンセル</button>
+              <button class="del-btn">削除</button>
+            </td>
+          </tr>
+          <tr>
+            <td>2026-07-01</td>
+            <td>給与</td>
+            <td><span class="badge-income">給与</span></td>
+            <td style="color:#059669;font-weight:500;">+250,000円</td>
+            <td><button class="del-btn">削除</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note">※ これはdocs/design/list.mdの画面レイアウトを再現した静的モックで、実際の操作(絞り込み・編集・API通信)はできません。2行目は編集モードの見た目のサンプルです。</p>
+  </main>
+</body>
+</html>
